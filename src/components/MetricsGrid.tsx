@@ -1,4 +1,3 @@
-import React from 'react';
 import GlassCard from './GlassCard';
 import { Droplets, Sun, CloudRain, Wind, Download, Eye, Thermometer, Sunrise, Sunset } from 'lucide-react';
 import { type WeatherData } from '../api/weather';

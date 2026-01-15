@@ -1,40 +1,73 @@
-🌌 Rift Sky
-Rift Sky is a minimalist, high-contrast weather Progressive Web App (PWA) built for the Rift Ecosystem. It strips away the clutter of traditional weather apps to focus on high-impact environmental data, specifically tuned for the Indian climate.
+# React + TypeScript + Vite
 
-✨ Features
-🌪️ Signature "Rain Start" Timer
-Leveraging granular 15-minute precipitation probability data from Open-Meteo, Rift Sky provides a real-time countdown. If rain is detected within the hour, a high-visibility alert triggers: "Rain starting in 12 mins. Secure the perimeter."
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-🌫️ Indian Standard AQI & UV
-Focuses on the metrics that matter. Get prominent, color-coded cards for Air Quality (AQI) and UV Index, critical for daily planning in high-exposure regions.
+Currently, two official plugins are available:
 
-🟣 Monsoon-Adaptive UI
-Built with a "Liquid Glass" design system, the entire app interface dynamically reacts to the environment. When humidity crosses 85%, the background gradient shifts into a deep Retro Iris (#A056FF) pulse, signaling a high-monsoon state.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-📱 Android-Native Experience (PWA)
-Standalone Mode: Hides browser UI for a true app-like feel.
+## React Compiler
 
-Offline Caching: View the last fetched weather data instantly, even without a connection.
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-Maskable Icons: Perfectly circular launcher icons that fit the Android Material You aesthetic.
+## Expanding the ESLint configuration
 
-🛠️ Tech Stack
-Core: React 18 + Vite (Lightning fast build tool)
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-Language: TypeScript (Type-safe logic)
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-Styling: Tailwind CSS + Glassmorphism logic
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
 
-Data: Open-Meteo API (Free, Zero-API Key, No Tracking)
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
 
-PWA: vite-plugin-pwa (Service Workers & Manifest)
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-Android Build: Bubblewrap CLI (PWA to .aab)
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-🛡️ License
-Distributed under the MIT License. See LICENSE for more information.
-
-🤝 Contact
-Project Lead: Aashirwad Sharma
-
-Ecosystem: Rift Eco
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
