@@ -3,10 +3,18 @@ import { useWeather } from './hooks/useWeather';
 import WeatherHero from './components/WeatherHero';
 import MetricsGrid from './components/MetricsGrid';
 import SearchBar from './components/SearchBar';
+import { NotificationPermissionModal } from './components/NotificationPermissionModal';
+import {
+  registerServiceWorker,
+  sendCoordinatesToSW,
+  registerPeriodicSync,
+  exposeTriggerToWindow
+} from './utils/sw-register';
 
 function App() {
   const { weather, aqi, loading, error, locationName, rainMinutes, isMonsoon, updateLocation } = useWeather();
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [showNotificationModal, setShowNotificationModal] = useState(true);
 
   useEffect(() => {
     // PWA Install Prompt Logic
@@ -17,10 +25,41 @@ function App() {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
 
+    // Expose window.triggerWeatherUpdate for Android/Cron
+    exposeTriggerToWindow();
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
+
+  // Service Worker & Notification Setup
+  useEffect(() => {
+    const setupNotifications = async () => {
+      // Only register SW if notification permission is granted
+      if (Notification.permission === 'granted') {
+        const registration = await registerServiceWorker();
+
+        if (registration) {
+          // Try to register periodic sync (might not be supported)
+          await registerPeriodicSync(registration);
+        }
+      }
+    };
+
+    setupNotifications();
+  }, []);
+
+  // Send coordinates to Service Worker whenever weather data updates
+  useEffect(() => {
+    if (weather && 'serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      // Extract coordinates from the weather hook's current location
+      // Since useWeather uses geolocation, we need to get the coords
+      navigator.geolocation.getCurrentPosition((position) => {
+        sendCoordinatesToSW(position.coords.latitude, position.coords.longitude);
+      });
+    }
+  }, [weather]);
 
   const handleInstall = () => {
     if (deferredPrompt) {
@@ -54,6 +93,10 @@ function App() {
 
   return (
     <div className="min-h-screen p-4 md:p-8 flex items-center justify-center relative overflow-hidden">
+      {/* Notification Permission Modal */}
+      {showNotificationModal && (
+        <NotificationPermissionModal onClose={() => setShowNotificationModal(false)} />
+      )}
       {/* Monsoon Inner Glow Effect */}
       {isMonsoon && (
         <div className="fixed inset-0 pointer-events-none z-10 animate-pulse shadow-[inset_0_0_100px_30px_rgba(160,86,255,0.3)] transition-opacity duration-1000"></div>

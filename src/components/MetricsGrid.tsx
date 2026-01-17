@@ -59,7 +59,7 @@ const MetricsGrid = ({ weather, aqi, rainMinutes, isMonsoon, showInstall, onInst
                     <Droplets size={18} /> Humidity
                 </div>
                 <div className="text-3xl font-bold">{Math.round(currentHumidity)}%</div>
-                <div className="text-xs text-gray-500">Dew Point 15°</div>
+                <div className="text-xs text-gray-500">Dew Point {Math.round(weather.current_weather.temperature - ((100 - currentHumidity) / 5))}°</div>
             </GlassCard>
 
             {/* Visibility */}
